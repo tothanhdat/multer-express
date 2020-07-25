@@ -34,7 +34,7 @@ router.post('/add-user', UPLOAD_CONFIG.single('image'), (req, res) => {
     const { username } = req.body;
     const infoUser = { username: username, image: originalname }
     console.log(infoUser);
-    
+
     users.push(infoUser);
     res.redirect('/user/list');
 });
@@ -45,6 +45,8 @@ router.get('/remove/:username', async (req, res) => {
     const infoUserRemoveImage = users[indexFinded];
 
     const imagePathRemove = path.resolve(__dirname, `../public/upload/${infoUserRemoveImage.image}`);
+    console.log(infoUserRemoveImage.image);
+
     let result = await REMOVE_IMAGE(imagePathRemove, users, indexFinded);
 
     res.redirect('/user/list');
@@ -60,12 +62,21 @@ router.get('/remove2/:username', async (req, res) => {
     const { username } = req.params;
     const indexFinded = usersTest.findIndex(user => Object.is(username.toString(), user.username.toString()));
     const infoUserRemoveImages = usersTest[indexFinded];
-    console.log({ infoUserRemoveImages });
-    
-    const imagePathRemoves = path.resolve(__dirname, `../public/upload/${infoUserRemoveImages.image}`);
-    let result = await REMOVE_IMAGE(imagePathRemoves, usersTest, indexFinded);
-
+    const imageUser = infoUserRemoveImages.images.forEach(async image => {
+        const imagePathRemoves = path.resolve(__dirname, `../public/upload/${image}`);
+        let result = await REMOVE_IMAGE(imagePathRemoves, usersTest, indexFinded);
+    })
     res.redirect('/user/list-demo');
 });
 
+//ADD
+router.post('/add-user2', UPLOAD_CONFIG.single('image'), (req, res) => {
+    const { originalname } = req.file;
+    const { username } = req.body;
+    const infoUser = { username: username, images: originalname }
+    console.log(infoUser);
+
+    users.push(infoUser);
+    res.redirect('/user/demo2');
+});
 module.exports = router;
